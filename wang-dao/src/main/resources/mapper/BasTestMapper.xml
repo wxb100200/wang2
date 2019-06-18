@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.base.wang.mapper.BasTestMapper">
+  <resultMap id="BaseResultMap" type="com.base.wang.entity.BasTest">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="username" jdbcType="VARCHAR" property="username" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+  </resultMap>
+
+  <select id="selectByIdVo" resultType="com.base.wang.entity.BasTest">
+    SELECT * from bas_test WHERE id=#{id}
+  </select>
+  <select id="findByUserName" resultType="com.base.wang.entity.BasTest">
+    SELECT * from bas_test WHERE username=#{username}
+  </select>
+</mapper>
