@@ -1,0 +1,56 @@
+server:
+  port: 8002
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/wang?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    username: root
+    password:
+  redis:
+    host: 10.1.1.121
+    port: 6379
+    database: 1
+    timeout: 86400
+    password:
+    jedis:
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
+
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  #你可能在其他教程文章中看到有config-location的配置
+  #如果你配置了mapper-location，就不用配置config-location中的<mappers></mappers>中内容
+
+# 分页配置
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+
+# 打印执行sql语句
+#logging:
+#  level:
+#     com.base.wang.mapper : debug
+
+logging:
+  config: classpath:logback-mj.xml
+log:
+  level:
+    root: info
+    my: info
+  file: logs/wang-web.log
+  maxsize: 30MB
+#打印日志
+#logging:
+#  level:
+#    com.base.wang.mapper: trace
+
+#上传文件路径
+upload:
+    path: F://szjx/upload/
