@@ -8,7 +8,9 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -56,10 +58,25 @@ public class UserRealm extends AuthorizingRealm {
 
         ByteSource credentialsSalt = ByteSource.Util.bytes(bean.getUsername());
 
-        return new SimpleAuthenticationInfo(bean, bean.getPassword(),
+        AuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(bean, bean.getPassword(),
                 credentialsSalt, getName());
+        this.setSession(SessionConstants.SESSION_LOGIN_USER, bean);
+        return authenticationInfo;
     }
-
+    /**
+     * 将一些数据放到ShiroSession中,以便于其它地方使用
+     *
+     * @see
+     */
+    private void setSession(Object key, Object value) {
+        Subject currentUser = SecurityUtils.getSubject();
+        if (null != currentUser) {
+            Session session = currentUser.getSession();
+            if (null != session) {
+                session.setAttribute(key, value);
+            }
+        }
+    }
     // 模拟Shiro用户加密，假设用户密码为123456
     public static void main(String[] args){
         // 用户名

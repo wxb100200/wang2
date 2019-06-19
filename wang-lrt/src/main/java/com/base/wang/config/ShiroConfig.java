@@ -1,5 +1,6 @@
 package com.base.wang.config;
 
+import com.base.wang.filter.LoginFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.servlet.Filter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -50,6 +52,10 @@ public class ShiroConfig {
         bean.setLoginUrl("/login.html");
         // 设置未授权提示Url
         bean.setUnauthorizedUrl("/error/unAuth");
+
+        Map<String, Filter> filters=new LinkedHashMap<String, Filter>();
+        filters.put("authc",new LoginFilter());
+        bean.setFilters(filters);
 
         /**
          * anon：匿名用户可访问

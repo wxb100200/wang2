@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,22 +39,7 @@ public class UserController {
 
     @ResponseBody
     @RequestMapping("/login")
-    public PageReturn login(String username, String password,HttpServletRequest request,HttpServletResponse response) throws Exception {
-        Cookie uuidCookie=findCookie(request,"uuid");
-        if (uuidCookie==null) {
-           return userNameLogin(request,response, username,  password);
-        }else {
-            return uuidLogin(response, uuidCookie);
-        }
-    }
-
-    private PageReturn uuidLogin( HttpServletResponse response, Cookie uuidCookie) throws Exception {
-        String uuid=uuidCookie.getValue();
-        String redisValue=jedisClient.hget("wangxiaobing",uuid);
-        String userInfo=JwtUtil.verify(redisValue);
-        Map map=JsonUtil.json2Map(userInfo);
-        String username=map.get("username").toString();
-        String password=map.get("password").toString();
+    public PageReturn login(String username,String password,HttpServletRequest request,HttpServletResponse response) throws NoSuchAlgorithmException {
         // 1.获取Subject
         Subject subject = SecurityUtils.getSubject();
         // 2.封装用户数据
@@ -61,65 +47,33 @@ public class UserController {
         // 3.执行登录方法
         try{
             subject.login(passwordToken);
-            Map<String,Object> result=new HashMap<String, Object>();
-            result.put("mobile",username);
-            result.put("uuid",uuid);
-            return PageReturn.successData(result);
-        } catch (UnknownAccountException e){
-            e.printStackTrace();
-            cleanCookie(response,uuidCookie);
-            return PageReturn.fail("用户名不存在!");
-        } catch (IncorrectCredentialsException e){
-            cleanCookie(response,uuidCookie);
-            return PageReturn.fail("密码错误!");
-        }
-    }
-
-    private  PageReturn userNameLogin(HttpServletRequest request,HttpServletResponse response,String username, String password){
-        // 1.获取Subject
-        Subject subject = SecurityUtils.getSubject();
-        // 2.封装用户数据
-        UsernamePasswordToken passwordToken= new UsernamePasswordToken(username, password);
-        // 3.执行登录方法
-        try{
-            subject.login(passwordToken);
-            String uuid = UUIDUtil.generateNumber();
             Date date= DateUtils.addHours(new Date(),1);
-            Map<String,String> data=new HashMap<String, String>();
-            data.put("username",username);
-            data.put("password",password);
-            String token= JwtUtil.generateToken(JsonUtil.toJson(data),date);
-            jedisClient.hset("wangxiaobing",uuid,token);
-            Map<String,Object> result=new HashMap<String, Object>();
-            result.put("mobile",username);
-            result.put("uuid",uuid);
-            addCookie(response,uuid);
-            return PageReturn.successData(result);
+            Map<String,String> mapData=new HashMap<String, String>();
+            mapData.put("username",username);
+            mapData.put("password",password);
+            String token= JwtUtil.generateToken(JsonUtil.toJson(mapData),date);
+            addCookie(request,response,token);
+            return PageReturn.successData(token);
         } catch (UnknownAccountException e){
             e.printStackTrace();
             return PageReturn.fail("用户名不存在!");
         } catch (IncorrectCredentialsException e){
             return PageReturn.fail("密码错误!");
         }
-
     }
-    private Cookie findCookie(HttpServletRequest request,String name){
+
+    private void addCookie(HttpServletRequest request,HttpServletResponse response,String token){
         Cookie[] cookies = request.getCookies();
-        if(cookies==null || cookies.length<=0)return null;
         for(Cookie cookie:cookies){
             String cookieName=cookie.getName();
-            if(cookieName.equals(name))return cookie;
+            if(cookieName.equals("token")){
+                cookie.setValue(null);
+                cookie.setMaxAge(0);// 立即销毁cookie
+                cookie.setPath("/");
+                response.addCookie(cookie);
+            }
         }
-        return null;
-    }
-    private void cleanCookie(HttpServletResponse response,Cookie cookie){
-        cookie.setValue(null);
-        cookie.setMaxAge(0);// 立即销毁cookie
-        cookie.setPath("/");
-        response.addCookie(cookie);
-    }
-    private void addCookie(HttpServletResponse response,String uuid){
-        Cookie cookie = new Cookie("uuid", uuid);
+        Cookie cookie = new Cookie("token", token);
         cookie.setMaxAge(30 * 60);// 设置为30min
         cookie.setPath("/");
         cookie.setDomain("huzldt.com");
