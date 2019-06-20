@@ -1,5 +1,6 @@
 package com.base.wang.controller;
 
+import com.base.wang.common.Global;
 import com.base.wang.config.InitConfig;
 import com.base.wang.entity.BasTest;
 import com.base.wang.mapper.BasTestMapper;
@@ -93,5 +94,9 @@ public class IndexController {
     public String initConfig(){
         logger.info("---->>>>>>>>>>>>>>>>>dsfdsfsadfsadfasdfsadf");
         return InitConfig.UPLOAD_PATH;
+    }
+    @GetMapping(value = "/initConfig2")
+    public String initConfig2(){
+        return Global.CONFIG.get("wang_code");
     }
 }

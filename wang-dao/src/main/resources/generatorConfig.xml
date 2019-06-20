@@ -62,7 +62,8 @@
 
         <!-- table可以有多个,每个数据库中的表都可以写一个table，tableName表示要匹配的数据库表,也可以在tableName属性中通过使用%通配符来匹配所有数据库表,只有匹配的表才会自动生成文件 -->
         <!-- 是否生成方法的全部缺省值都为true -->
-        <table tableName="bas_test"/>
+        <!--<table tableName="bas_test"/>-->
+        <table tableName="bas_config_param"/>
         <!--<table tableName="bas_user"/>-->
         <!--<table tableName="bas_role"/>-->
         <!--<table tableName="bas_resource"/>-->
