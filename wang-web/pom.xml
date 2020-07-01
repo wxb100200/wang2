@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
-        <mysql-driver.version>5.1.29</mysql-driver.version>
+        <mysql-driver.version>8.0.16</mysql-driver.version>
         <org.springframework.boot.version>2.1.5.RELEASE</org.springframework.boot.version>
         <java.main.class>com.base.wang.web.WangWebApplication</java.main.class>
     </properties>
